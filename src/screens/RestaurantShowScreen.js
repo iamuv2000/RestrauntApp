@@ -1,16 +1,47 @@
-import React from 'react'
-import {View,Text,StyleSheet} from 'react-native'
+import React, {useState,useEffect} from 'react'
+import {View,Text,StyleSheet,FlatList,Image} from 'react-native'
+import yelp from '../api/yelp'
 
-const RestaurantShowScreen = () => {
+const RestaurantShowScreen = ({navigation}) => {
+    
+    const [restaurant,setRestaurant] = useState(null)
+
+    const id  = navigation.getParam('id')
+
+    console.log(restaurant)
+
+    const getRestaurant = async(id) => {
+        const response = await yelp.get(`/${id}`)
+        setRestaurant(response.data)
+    }
+    useEffect(()=>{
+        getRestaurant(id)
+    },[])
+
+    if(!restaurant){
+        return null
+    }
+
     return (
         <View>
-        <Text>Hello!</Text>
+        <Text>{restaurant.name}</Text>
+        <FlatList 
+            data={restaurant.photos}
+            keyExtractor={(photo)=>photo}
+            renderItem={({item})=>{
+                return <Image style = {styles.ImageStyle}source={{uri: item}} />
+            }}
+        />
         </View>
     )
 }
 
 const styles = StyleSheet.create({
-
+    ImageStyle:{
+        height:200,
+        width: 300,
+        borderRadius:4
+    }
 })
 
 export default RestaurantShowScreen
